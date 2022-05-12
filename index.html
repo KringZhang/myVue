@@ -1,0 +1,27 @@
+<html>
+  <body>
+    <div id="app">
+      <input :value="age" v-model="age" v-bind:value="name" />
+      <input :placeholder="placeholder" :value="age" />
+      <input v-model="name" />
+      <input v-model="name" v-show="" v-if="true" />
+      <input class="basic" :class="className" />
+    </div>
+  </body>
+
+  <script src="./myVue.js"></script>
+  <script>
+    var myVue = new MyVue({
+      el: '#app',
+      data: {
+        placeholder: '请输入',
+        name: 'zks',
+        age: '23',
+        className: 'additional'
+      }
+    })
+    // setTimeout(function () {
+    //   myVue.data.name = 'ddhjadhaj'
+    // }, 2000)
+  </script>
+</html>
