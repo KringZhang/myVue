@@ -56,13 +56,9 @@ function compileDir(node, data) {
   });
   attrsToAdd.forEach(function(obj) {
     var attr = node.getAttribute(obj.name);
-    // arr里面的属性是需要直接追加而不是替换的
+    // arr里面的属性是直接追加而不是替换的
     var arr = ['class', 'style'];
-    if (arr.includes(obj.name)) {
-      // 如果已经存在该属性，那么直接追加而不是替换
-      node.setAttribute(obj.name, attr ? attr + ' ' + obj.value : obj.value);
-    } else {
-      node.setAttribute(obj.name, obj.value);
-    }
+    var val = arr.includes(obj.name) && attr ? attr + ' ' + obj.value : obj.value;
+    node.setAttribute(obj.name, val);
   })
 }
