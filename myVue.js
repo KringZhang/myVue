@@ -3,15 +3,16 @@ function MyVue(options) {
   var el = options.el;
   var element = document.querySelector(el);
   var data = options.data;
-  compileElement(element.childNodes, data)
+  var methods = options.methods;
+  compileElement(element.childNodes, data, methods)
 }
 
-function compileElement(childNodes, data) {
+function compileElement(childNodes, data, methods) {
   if (!childNodes || !childNodes.length) return;
   childNodes.forEach(function (x) {
     if (x.nodeType == 1) { // 元素节点
-      compileDir(x, data);
-      compileElement(x.childNodes, data);
+      compileDir(x, data, methods);
+      compileElement(x.childNodes, data, methods);
     } else if (x.nodeType == 3 && reg.test(x.textContent)) { // 文本节点
       // 把{{name}}模板替换成具体的变量(name)对应的值
       x.textContent = x.textContent.replace(reg, data[reg.exec(x.textContent)[1]]);
@@ -19,7 +20,7 @@ function compileElement(childNodes, data) {
   })
 }
 
-function compileDir(node, data) {
+function compileDir(node, data, methods) {
   var attrs = node.attributes;
   // 缓存一下需要添加的属性
   var attrsToAdd = [];
@@ -33,22 +34,50 @@ function compileDir(node, data) {
     } catch(err) {
       attrValue = data[attr.value] === void 0 ? '' : data[attr.value];
     }
-    if(dirName.indexOf(':') != -1) {
-      var attrName = dirName.substring(dirName.lastIndexOf(':') + 1);
-      // 不能在此处删除属性和添加属性，不然循环的下次数据可能会错乱
-      // node.setAttribute(attrName, attrValue);
-      // node.removeAttribute(dirName);
-      attrsToAdd.push({ name: attrName, value: attrValue });
+    // 事件
+    if (dirName.includes('@') || dirName.includes('v-on:')) {
+      // 这里先添加进数组，防止后面被改名了
       attrsToRemove.push(dirName);
-    } else if (dirName.indexOf('v-model') != -1) {
-      attrsToAdd.push({ name: 'value', value: attrValue });
-      attrsToRemove.push('v-model');
-    } else if (dirName.indexOf('v-if') != -1) {
-      !attrValue && attrsToAdd.push({ name: 'style', value: 'display: none;' });
-      attrsToRemove.push('v-if');
-    } else if (dirName.indexOf('v-show') != -1) {
-      !attrValue && attrsToAdd.push({ name: 'style', value: 'visibility: hidden;' });
-      attrsToRemove.push('v-show');
+      dirName = dirName.replace('v-on:', '@');
+      var eventName = dirName.substring(dirName.lastIndexOf('@') + 1);
+      var isMethod = false;
+      var methodName = '';
+      console.log(attr);
+      console.dir(attr);
+      if (attr.value.includes('(')) {
+        methodName = attr.value.substring(0, attr.value.indexOf('('))
+      }
+      // 先判断绑定的内容是否在methods里面存在对应的方法名，如果存在，直接绑定该方法
+      Object.keys(methods || {}).forEach(function(x) {
+        x == methodName && (isMethod = true);
+      })
+      // 如果是方法
+      if (isMethod) {
+        // TODO 传参时怎么带过来
+        node['on' + eventName] = function() { methods[methodName]() };
+      } else {
+        try { // 直接执行
+          node['on' + eventName] = function(){ eval(attr.value) };
+        } catch (err) {}
+      }
+    } else {
+      if(dirName.indexOf(':') != -1) {
+        var attrName = dirName.substring(dirName.lastIndexOf(':') + 1);
+        // 不能在此处删除属性和添加属性，不然循环的下次数据可能会错乱
+        // node.setAttribute(attrName, attrValue);
+        // node.removeAttribute(dirName);
+        attrsToAdd.push({ name: attrName, value: attrValue });
+        attrsToRemove.push(dirName);
+      } else if (dirName.indexOf('v-model') != -1) {
+        attrsToAdd.push({ name: 'value', value: attrValue });
+        attrsToRemove.push('v-model');
+      } else if (dirName.indexOf('v-if') != -1) {
+        !attrValue && attrsToAdd.push({ name: 'style', value: 'display: none;' });
+        attrsToRemove.push('v-if');
+      } else if (dirName.indexOf('v-show') != -1) {
+        !attrValue && attrsToAdd.push({ name: 'style', value: 'visibility: hidden;' });
+        attrsToRemove.push('v-show');
+      }
     }
   });
   attrsToRemove.forEach(function(name) {

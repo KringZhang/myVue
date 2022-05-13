@@ -1,11 +1,11 @@
 <html>
   <body>
     <div id="app">
-      <input :value="age" v-model="age" v-bind:value="name" />
-      <input :placeholder="placeholder" :value="age" />
-      <input v-model="name" />
+      <input :value="age" v-model="age" v-bind:value="name" v-on:click="name" />
+      <input :placeholder="placeholder" :value="age" @click="name('姓名')" />
+      <input v-model="name" @click="handleClick" />
       <input v-model="name" v-show="" v-if="true" />
-      <input class="basic" :class="className" />
+      <input class="basic" @click="console.log(111)" :class="className" />
     </div>
   </body>
 
@@ -18,6 +18,14 @@
         name: 'zks',
         age: '23',
         className: 'additional'
+      },
+      methods: {
+        handleClick(e) {
+          console.log(e);
+        },
+        name(e) {
+          console.log(e);
+        }
       }
     })
     // setTimeout(function () {
