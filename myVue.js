@@ -1,10 +1,11 @@
 var reg = /{{(.*)}}/;
 function MyVue(options) {
-  var el = options.el;
-  var element = document.querySelector(el);
-  var data = options.data;
-  var methods = options.methods;
-  compileElement(element.childNodes, data, methods)
+  this.el = options.el;
+  this.element = document.querySelector(this.el);
+  this.data = options.data;
+  this.methods = options.methods;
+  compileElement(this.element.childNodes, this.data, this.methods);
+  return this;
 }
 
 function compileElement(childNodes, data, methods) {
@@ -15,7 +16,16 @@ function compileElement(childNodes, data, methods) {
       compileElement(x.childNodes, data, methods);
     } else if (x.nodeType == 3 && reg.test(x.textContent)) { // 文本节点
       // 把{{name}}模板替换成具体的变量(name)对应的值
-      x.textContent = x.textContent.replace(reg, data[reg.exec(x.textContent)[1]]);
+      var name = reg.exec(x.textContent)[1];
+      var val = data[name];
+      var keys = name.split('.');
+      if (keys.length) {
+        var val = data;
+        keys.forEach(function(key) {
+          val = val[key];
+        })
+      }
+      x.textContent = x.textContent.replace(reg, val);
     }
   })
 }
@@ -41,7 +51,7 @@ function compileDir(node, data, methods) {
       dirName = dirName.replace('v-on:', '@');
       var eventName = dirName.substring(dirName.lastIndexOf('@') + 1);
       var isMethod = false;
-      var methodName = '';
+      var methodName = attr.value;
       console.log(attr);
       console.dir(attr);
       if (attr.value.includes('(')) {

@@ -3,9 +3,10 @@
     <div id="app">
       <input :value="age" v-model="age" v-bind:value="name" v-on:click="name" />
       <input :placeholder="placeholder" :value="age" @click="name('姓名')" />
-      <input v-model="name" @click="handleClick" />
+      <input v-model="age" @click="handleClick" />
       <input v-model="name" v-show="" v-if="true" />
       <input class="basic" @click="console.log(111)" :class="className" />
+      <div>{{obj.hobby.name}}</div>
     </div>
   </body>
 
@@ -17,7 +18,12 @@
         placeholder: '请输入',
         name: 'zks',
         age: '23',
-        className: 'additional'
+        className: 'additional',
+        obj: {
+          hobby: {
+            name: '篮球'
+          }
+        }
       },
       methods: {
         handleClick(e) {
