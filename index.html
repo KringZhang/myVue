@@ -1,23 +1,29 @@
 <html>
   <body>
     <div id="app">
-      <input :value="age" v-model="age" v-bind:value="name" v-on:click="name" />
+      <!-- <input :value="age" v-model="age" v-bind:value="name" v-on:click="name" />
       <input :placeholder="placeholder" :value="age" @click="name('姓名')" />
       <input v-model="age" @click="handleClick" />
       <input v-model="name" v-show="" v-if="true" />
       <input class="basic" @click="console.log(111)" :class="className" />
       <div>{{obj.hobby.name}}</div>
+      <div class="basic" :class="className">dada</div> -->
+      <input v-model="age" />
+      <div>{{age}}</div>
+      <button @click="changeAge">年龄+1</button>
     </div>
   </body>
 
   <script src="./myVue.js"></script>
+  <script src="./observe.js"></script>
+  <script src="./Dep.js"></script>
   <script>
     var myVue = new MyVue({
       el: '#app',
       data: {
         placeholder: '请输入',
         name: 'zks',
-        age: '23',
+        age: 23,
         className: 'additional',
         obj: {
           hobby: {
@@ -31,11 +37,14 @@
         },
         name(e) {
           console.log(e);
+        },
+        changeAge() {
+          myVue.data.age ++;
         }
       }
     })
-    // setTimeout(function () {
-    //   myVue.data.name = 'ddhjadhaj'
-    // }, 2000)
+    setTimeout(function () {
+      myVue.data.age = 18;
+    }, 2000)
   </script>
 </html>
