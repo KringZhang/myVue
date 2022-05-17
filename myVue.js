@@ -3,10 +3,27 @@ function MyVue(options) {
   this.el = options.el;
   this.element = document.querySelector(this.el);
   this.data = options.data;
+  proxyData(this, options.data);
   this.methods = options.methods;
   observe(this.data);
   compileElement(this.element.childNodes, this.data, this.methods);
+  options.mounted();
   return this;
+}
+
+function proxyData(self, data) {
+  Object.keys(data).forEach(function(key) {
+    Object.defineProperty(self, key, {
+      configurable: true,
+      enumerable: true,
+      get: function() {
+        return data[key];
+      },
+      set: function(newVal) {
+        data[key] = newVal;
+      }
+    });
+  });
 }
 
 function compileElement(childNodes, data, methods) {

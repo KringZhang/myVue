@@ -39,12 +39,14 @@
           console.log(e);
         },
         changeAge() {
-          myVue.data.age ++;
+          myVue.age ++;
         }
+      },
+      mounted() {
+        setTimeout(function () {
+          myVue.data.age = 18;
+        }, 1000);
       }
     })
-    setTimeout(function () {
-      myVue.data.age = 18;
-    }, 2000)
   </script>
 </html>
